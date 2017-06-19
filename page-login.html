@@ -1,0 +1,213 @@
+<?php
+ ob_start();
+ session_start();
+ require_once 'dbconnect.php';
+ 
+ // it will never let you open index(login) page if session is set
+ if ( isset($_SESSION['user'])!="" ) {
+  header("Location: home.php");
+  exit;
+ }
+ 
+ $error = false;
+ 
+ if( isset($_POST['btn-login']) ) { 
+  
+  // prevent sql injections/ clear user invalid inputs
+  $email = trim($_POST['email']);
+  $email = strip_tags($email);
+  $email = htmlspecialchars($email);
+  
+  $pass = trim($_POST['pass']);
+  $pass = strip_tags($pass);
+  $pass = htmlspecialchars($pass);
+  // prevent sql injections / clear user invalid inputs
+  
+  if(empty($email)){
+   $error = true;
+   $emailError = "Please enter your email address.";
+  } else if ( !filter_var($email,FILTER_VALIDATE_EMAIL) ) {
+   $error = true;
+   $emailError = "Please enter valid email address.";
+  }
+  
+  if(empty($pass)){
+   $error = true;
+   $passError = "Please enter your password.";
+  }
+  
+  // if there's no error, continue to login
+  if (!$error) {
+   
+   $password = hash('sha256', $pass); // password hashing using SHA256
+  
+   $res=mysql_query("SELECT userId, userName, userPass FROM users WHERE userEmail='$email'");
+   $row=mysql_fetch_array($res);
+   $count = mysql_num_rows($res); // if uname/pass correct it returns must be 1 row
+   
+   if( $count == 1 && $row['userPass']==$password ) {
+    $_SESSION['user'] = $row['userId'];
+    header("Location: home.php");
+   } else {
+    $errMSG = "Incorrect Credentials, Try again...";
+   }
+    
+  }
+  
+ }
+?>
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Knight - Responsive Multi-Purpose HTML Template</title>
+        <meta name="description" content="Responsive Multi-Purpose HTML Template">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#222222"> <!-- Android 5.0 Tab Color -->
+        <link rel="shortcut icon" href="favicon.ico">
+
+        <!-- Google Fonts -->
+        <!--<link href='http://fonts.googleapis.com/css?family=Ubuntu:300,400,500' rel='stylesheet' type='text/css'>-->
+        <!--<link href='http://fonts.googleapis.com/css?family=Raleway:400,500,600,700' rel='stylesheet' type='text/css'>-->
+
+        <!-- Icon Fonts CSS -->
+        <link rel="stylesheet" href="css/knight-iconfont.css">
+        <link rel="stylesheet" href="css/font-awesome.min.css">
+        <!-- <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"> -->
+
+        <!-- Vendor CSS -->
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/reset.css">
+
+        <!-- Plugins CSS -->
+        <link rel="stylesheet" href="css/animate.css">
+
+        <!-- Template CSS -->
+        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="css/shortcodes.css">
+        <link rel="stylesheet" href="css/custom-bg.css">
+        <link rel="stylesheet" href="css/login.css"> 
+        <link rel="stylesheet" href="css/register.css">
+        <!-- JS -->
+        <script src="js/vendor/modernizr-2.6.2.min.js"></script>
+    </head>
+    <body class="fullscreen-background fullscreen-bg1">
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <div class="main-wrapper transparent-bg">
+
+            <!-- Start main-contents -->
+            <section class="main-contents padding-top30 padding-bottom10">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-8 col-md-offset-2">
+                            <section class="countdown countdown-style2 white-color">
+                                <header class="wow fadeInDown">
+                                    <div class="logo-container">
+                                        <a href="index.html" class="logo">
+                                            <img src="img/logo/logo7-decor-white.png" alt="Knight Logo" height="25%" width="25%">
+                                        </a>
+                                    </div><!-- /logo-container -->
+                                    
+                                    </header>
+
+                                <!--/code here-->
+                                <div class="conatainer">
+                                    <div class="myRegister col-md-5">
+                                
+                                     <h3>Register Now</h3>
+                                        <form class="loginForm">
+                                        <input type="text" name="username" placeholder="Your Name"> 
+                                        <input type="text" name="email" placeholder="Email ID"> 
+                                        <!-- <div class="conatiner">
+                                        <div class="col-md-1">
+                                            <p>+91</p>
+                                        </div>
+                                        <div class="col-md-8">
+                                            +91
+                                            <input type="text" name="userphonenumber" placeholder="Phone Number" width="">
+                                        </div> 
+                                    </div> -->
+
+                                        <input type="text" name="userphonenumber" placeholder="Phone Number" maxlength="10">
+                                        <input type="password" name="userpassword" placeholder="Password">
+                                        <input type="password" name="userconfirmpassword" placeholder="Confirm Password">
+                                        <button type="submit" id="login_button">
+                                        Register</button>
+                                        <br>
+                                        </form>
+                                
+                                    </div>
+                                    
+
+                            <div class="or col-md-2">
+                                
+                                <br>
+                                <br>
+                                <br><br><br><br><br><br><br><br><p> OR </p>
+                            
+                        </div>
+
+                            
+                                <div class="myLogin col-md-5">
+                                        
+                                    <h3>Login</h3>
+                                    <form class="loginForm"> 
+                                    <input type="text" name="userphonenumber" placeholder="Phone Number" maxlength="10"> 
+                                    <input type="password" name="userpassword" placeholder="Password">
+                                    <button type="submit" id="login_button">
+                                    Login</button><br>
+                                    <br><a href="#">Forget password ?</a>
+                                    <br>
+                                    </form>
+                                
+                            
+                            </div>
+                            </div>
+                        </div>
+                                
+                        
+                                
+                        
+                                
+                        
+                                <!-- <footer class="wow fadeInDown" data-wow-delay="0.6s">
+                                    <p class="copyright uppercase">© 2016 Froto.in</p>
+                                    <div class="socials-container">
+                                        <ul class="clearfix">
+                                            <li><a href="#" class="white-color"><i class="fa fa-twitter"></i></a></li>
+                                            <li><a href="#" class="white-color"><i class="fa fa-facebook"></i></a></li>
+                                            <li><a href="#" class="white-color"><i class="fa fa-dribbble"></i></a></li>
+                                            <li><a href="#" class="white-color"><i class="fa fa-linkedin"></i></a></li>
+                                        </ul>
+                                    </div><!-- /socials-container
+                                </footer> -->
+                            </section><!-- /countdown-wrapper -->
+                        </div><!-- /col-md-8 -->
+                    </div><!-- /row -->
+                </div><!-- /container -->
+            </section>
+            <!-- End main-contents -->
+
+        </div><!-- /main-wrapper -->
+
+        <!-- JS -->
+        <script src="js/vendor/jquery.min.js"></script>
+        <script src="js/jquery.countdown.plugin.min.js"></script>
+        <script src="js/imagesloaded.pkgd.min.js"></script>
+        <script src="js/jquery.countdown.min.js"></script>
+        <script src="js/jquery.stellar.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        
+        <script src="js/wow.min.js"></script>
+        <script src="js/main.js"></script>
+        
+    </body>
+</html>
+<?php ob_end_flush(); ?>
